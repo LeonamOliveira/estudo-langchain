@@ -1,4 +1,4 @@
-from langchain.tools import tool
+from langchain.tools import BaseTool, tool
 
 @tool
 def multiply(a: float, b: float) -> float:
@@ -11,3 +11,5 @@ def multiply(a: float, b: float) -> float:
             the resulting float of the equation a * b
     """
     return a * b
+
+tools: list[BaseTool]
