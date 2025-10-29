@@ -12,4 +12,5 @@ def multiply(a: float, b: float) -> float:
     """
     return a * b
 
-tools: list[BaseTool]
+TOOLS: list[BaseTool] = [multiply]
+TOOLS_BY_NAME: dict[str, BaseTool] = {tool.name: tool for tool in TOOLS}
