@@ -1,10 +1,12 @@
 from langchain.tools import tool
 from langchain.chat_models import init_chat_model
-from langchain.messages import AnyMessage, SystemMessage
+from langchain.messages import AnyMessage, SystemMessage, ToolMessage
+from langgraph.graph import StateGraph, START, END
 
+from typing import Literal
 from typing_extensions import TypedDict, Annotated
-import operator
 
+import operator
 
 model = init_chat_model(
     "anthropic:claude-sonnet-4-5",
@@ -76,3 +78,16 @@ def llm_call(state: dict):
         "llm_calls": state.get('llm_calls', 0) + 1
     }
 
+#The conditional edge function is used to route to the tool node or end based upon whether the LLM made a tool call.
+def should_continue(state: MessagesState) -> Literal["tool_node", END]:
+    """Decide if we should continue the loop or stop based upon whether the LLM made a tool call"""
+
+    messages = state["messages"]
+    last_message = messages[-1]
+
+    # If the LLM makes a tool call, then perform an action
+    if last_message.tool_calls:
+        return "tool_node"
+
+    # Otherwise, we stop (reply to the user)
+    return END
