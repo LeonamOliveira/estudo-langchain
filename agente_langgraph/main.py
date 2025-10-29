@@ -1,5 +1,8 @@
 from langchain.tools import tool
 from langchain.chat_models import init_chat_model
+from langchain.messages import AnyMessage
+from typing_extensions import TypedDict, Annotated
+import operator
 
 
 model = init_chat_model(
@@ -46,3 +49,9 @@ def divide(a: int, b: int) -> float:
 tools = [add, multiply, divide]
 tools_by_name = {tool.name: tool for tool in tools}
 model_with_tools = model.bind_tools(tools)
+
+
+#The graph’s state is used to store the messages and the number of LLM calls.
+class MessagesState(TypedDict):
+    messages: Annotated[list[AnyMessage], operator.add]
+    llm_calls: int
