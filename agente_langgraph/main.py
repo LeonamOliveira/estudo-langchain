@@ -1,6 +1,7 @@
 from langchain.tools import tool
 from langchain.chat_models import init_chat_model
-from langchain.messages import AnyMessage
+from langchain.messages import AnyMessage, SystemMessage
+
 from typing_extensions import TypedDict, Annotated
 import operator
 
@@ -55,3 +56,23 @@ model_with_tools = model.bind_tools(tools)
 class MessagesState(TypedDict):
     messages: Annotated[list[AnyMessage], operator.add]
     llm_calls: int
+
+#The model node is used to call the LLM and decide whether to call a tool or not.
+
+def llm_call(state: dict):
+    """LLM decides whether to call a tool or not"""
+
+    return {
+        "messages": [
+            model_with_tools.invoke(
+                [
+                    SystemMessage(
+                        content="You are a helpful assistant tasked with performing arithmetic on a set of inputs."
+                    )
+                ]
+                + state["messages"]
+            )
+        ],
+        "llm_calls": state.get('llm_calls', 0) + 1
+    }
+
